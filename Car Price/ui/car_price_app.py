@@ -3,6 +3,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from datetime import date
+import os
 # If your model file is a full pipeline, it needs the correct imports
 # from sklearn.preprocessing import OneHotEncoder, StandardScaler 
 # from sklearn.compose import ColumnTransformer
@@ -11,12 +12,18 @@ from datetime import date
 @st.cache_resource
 def load_assets():
     """Loads the model pipeline and feature list from path or disk"""
+    
     try:
+        # Get current file directory (works on both local and Streamlit Cloud)
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        model_path = os.path.join(BASE_DIR, 'car_price_Gradient_Boost_pipeline.pkl')
+        features_path = os.path.join(BASE_DIR, 'original_feature_columns.pkl')
         # Load the final pipeline
-        pipeline = joblib.load('car_price_Gradient_Boost_pipeline.pkl')
+        pipeline = joblib.load(model_path)
 
         # Load the original feature names for Streamlit input
-        original_features = joblib.load('original_feature_columns.pkl')
+        original_features = joblib.load(features_path)
         
         return pipeline, original_features
     except FileNotFoundError as e:
@@ -185,4 +192,5 @@ if predict_clicked:
         st.error(f"Input DataFrame Columns: {input_df.columns.tolist()}")
         st.error(f"Model Expected Features: {original_features}")
         st.exception(e) # Display the full exception traceback
+
 st.caption(f"© {current_year} [Cedrick Mkhabela]. All rights reserved. | Developed for a Machine Learning Deployment Project. Powered by Streamlit.| @Regenesy School of Technology") 
